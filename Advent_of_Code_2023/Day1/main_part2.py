@@ -8,7 +8,7 @@
 import os
 calibration_value = 0
 string_numbers = {"one" : 1,"two" : 2,"three" : 3,"four" : 4,"five" : 5,"six" : 6,"seven" : 7,"eight" : 8,"nine" : 9}
-f = open(r'D:\Advent of Code\2023\1\Input.txt', 'r')
+f = open(r'D:\Advent_of_Code\Advent_of_Code_2023\Day1\Puzzle_Input.txt', 'r')
 for each_line in f:
     each_line = each_line.rstrip("\n")
     line_indexesf = []

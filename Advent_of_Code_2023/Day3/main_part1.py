@@ -1,6 +1,6 @@
 import os
 import numpy as np
-f = open(r'D:\Advent of Code\2023\Day3\Puzzle_Input.txt', 'r')
+f = open(r'D:\Advent_of_Code\Advent_of_Code_2023\Day3\Puzzle_Input.txt', 'r')
 counter = 0
 for each_line in f:
     line_symbol_mask = []

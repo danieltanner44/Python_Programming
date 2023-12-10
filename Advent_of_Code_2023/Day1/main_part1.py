@@ -1,6 +1,6 @@
 import os
 calibration_value = 0
-f = open(r'D:\Advent of Code\2023\1\Input.txt', 'r')
+f = open(r'D:\Advent_of_Code\Advent_of_Code_2023\Day1\Puzzle_Input.txt', 'r')
 for each_line in f:
     each_line = each_line.rstrip("\n")
     first_num = last_num = 10
