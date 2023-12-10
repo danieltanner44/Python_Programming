@@ -1,22 +1,20 @@
-import os
-calibration_value = 0
-f = open(r'D:\Advent_of_Code\Advent_of_Code_2023\Day4\Puzzle_Input_d.txt', 'r')
+import numpy as np
+f = open(r'D:\Advent_of_Code\Advent_of_Code_2023\Day4\Puzzle_Input.txt', 'r')
+counter = 0
 for each_line in f:
-    each_line = each_line.rstrip("\n")
-    first_num = last_num = 10
-    for j in range(0,len(each_line)):
-        try:
-            if first_num == 10:
-                first_num = int(each_line[j])
-        except:
-            pass
-        try:
-            if last_num == 10:
-                last_num = int(each_line[len(each_line)-j-1])
-        except:
-            pass
-    line_calibration_value = int("%d%d" % (first_num, last_num))
-    print("Found line calibration value: " + str(line_calibration_value))
-    calibration_value = calibration_value + line_calibration_value
-print("Found file calibration value: " + str(calibration_value))
+    each_line = each_line.rstrip("\n").split()
+    if counter == 0:
+        game_data = each_line
+        counter = counter + 1
+    else:
+        game_data = np.vstack((game_data, each_line))
+vertical_bar = np.where(np.char.find(game_data[1,:],"|") == 0)[0]
+game_data = np.delete(game_data,[0, 1, int(vertical_bar)],1)
+total_points = 0
+for i in range(0,np.shape(game_data)[0]):
+    points = np.shape(game_data)[1] - len(list(set(game_data[i,:])))
+    if points > 1:
+        points = 1 * 2**(points-1)
+    total_points = total_points + points
+print(total_points)
 f.close()
