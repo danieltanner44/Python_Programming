@@ -1,7 +1,7 @@
 import numpy as np
 import time
 
-def reading_input_data(f, card_values):
+def reading_input_data(f):
     print("Reading input data...", end = "")
     print("[complete]", end="\n")
     print(" ")
@@ -9,30 +9,34 @@ def reading_input_data(f, card_values):
     data = np.array([])
     counter = 0
     only_once = False
-    temp_hand_max_min = np.array([])
-    hand_max = np.array([], dtype=int)
-    hand_min = np.array([], dtype=int)
     for each_line in f:
         # Lets read in all the key information
         temp = each_line.rstrip("\n").split()
         [temp.append(letter) for letter in str(temp[0:1])]
-        temp_hand_max_min = [card_values.get(str(temp[4 + i])) for i in range(5)]
-        hand_min = np.append(hand_min, min(temp_hand_max_min))
-        hand_max = np.append(hand_max, max(temp_hand_max_min))
         if only_once == False:
             data = temp
-            hand_min_index = np.argmin(temp_hand_max_min)
-            hand_max_index = np.argmax(temp_hand_max_min)
             only_once = True
         else:
             data = np.vstack((data, temp))
-            hand_min_index = np.append(hand_min_index, np.argmin(temp_hand_max_min))
-            hand_max_index = np.append(hand_max_index, np.argmax(temp_hand_max_min))
-            print(hand_min_index, hand_max_index, hand_min, hand_max)
         counter += 1
     # Delete unneeded columns
     data = np.delete(data, [2, 3, 9, 10], 1)
-    return data, counter, hand_min, hand_max, hand_min_index, hand_max_index
+    print(data)
+    return data, counter
+
+def find_jokers(data):
+    joker_indexes = np.array(np.zeros(shape=[np.shape(data)[0],np.shape(data)[1] - 2]), dtype=int)
+    number_of_jokers = np.array(np.zeros(shape=[np.shape(data)[0]], dtype=int))
+    print(data)
+    for i in range(np.shape(data)[0]):
+        counter, counter1 = 0, 0
+        for j in range(2,np.shape(data)[1]):
+            if data[i,j] == "J":
+                number_of_jokers[i] += 1
+                joker_indexes[i, counter1] = j
+                counter1 += 1
+            counter += 1
+    return number_of_jokers, joker_indexes
 
 def check_duplicates(characters):
     char_count = {}
@@ -65,9 +69,7 @@ def reorder_rows(start_index, j, data, card_values, number_of_hands):
         sort_list = np.array([], dtype=int)
         for k in range(start_index[i], start_index[i + 1]):
             sort_list = np.append(sort_list, card_values.get(data[k, j + 1]))
-        print(sort_list)
         temp = data[start_index[i]:start_index[i+1], :]
-        print(temp)
         data[start_index[i]:start_index[i+1], :] = temp[sort_list.argsort()]
     return data
 
@@ -81,54 +83,77 @@ def main():
     ts0 = time.time()
     print("Starting time:", ts0)
     print(" ")
-    card_values = {"A": 13, "K": 12, "Q": 11, "J": 10, "T": 9, "9": 8, "8": 7, "7": 6, "6": 5, "5": 4, "4": 3, "3": 2, "2": 1}
-    f = open(r'D:\Advent_of_Code\Advent_of_Code_2023\Day7\Puzzle_Input_d.txt', 'r')
-    data, number_of_hands, hand_min, hand_max, hand_min_index, hand_max_index = reading_input_data(f, card_values)
-    hand_type = joker_present = np.array([], dtype=np.int32)
+    card_values = {"A": 13, "K": 12, "Q": 11, "T": 10, "9": 9, "8": 8, "7": 7, "6": 6, "5": 5, "4": 4, "3": 3, "2":2, "J": 1}
+    f = open(r'D:\Advent_of_Code\Advent_of_Code_2023\Day7\Puzzle_Input.txt', 'r')
+    data, number_of_hands = reading_input_data(f)
+
+    # Lets see where are jokes are and how many there are in each hand
+    number_of_jokers, joker_indexes = find_jokers(data)
+    print(number_of_jokers)
+    print(joker_indexes)
+
+    hand_type = np.array([], dtype=np.int32)
+    counter = 0
     for hands in range(number_of_hands):
-        # Check if a joker is present
-        for i in range(5):
-            if data[hands, i] == "J":
-                print("found one")
-                joker_present = np.append(joker_present, 1)
-            else:
-                joker_present = np.append(joker_present, 0)
         # Step through each hand to determine its type
+
+        # Need to update this to reflect the additional joker if it is present in hand
+
         hand_type = np.append(hand_type, len(data[hands,2:7]) - len(set(data[hands,2:7])))
-        if hand_type[hands] == 0:
-            # Just highest card!
-            data[hands, hand_min_index] = hand_max # Make lowest card == highest card
-            hand_type[hands] = 2 # Now best is a pair
+        if hand_type[hands] == 0: # No duplicate cards
+            hand_type[hands] = 1 # Just highest card!
+            if number_of_jokers[counter] != 0:
+                hand_type[hands] = 2 # A pair is formed - note: as no pair existed only one or no jokers can be present!
         elif hand_type[hands] == 1:
             # just one pair!
-            data[hands, hand_min_index] = hand_max  # Make lowest card == highest card
-            hand_type[hands] = 3 # Now best is three of a kind
+            hand_type[hands] = 2
+            if number_of_jokers[counter] != 0:
+                if number_of_jokers[counter] == 1: # if true the jokers were not the pair!
+                    hand_type[hands] = 4 # Three of a kind is formed!
+                if number_of_jokers[counter] == 2: # if true the pair found were jokers!
+                    hand_type[hands] = 4 # Three of a kind is formed!
         elif hand_type[hands] == 2:
             # two pair or three of a kind
             result = check_duplicates(characters=data[hands,2:7])
-            if result == 2: #three of a kind
-                hand_type[hands] = 3 # Now best hand is four of a kind
-                data[hands, hand_min_index] = hand_max  # Make lowest card == highest card
-            else: #two pair
-                hand_type[hands] = 5 # Now best hand is a full house
-                data[hands, hand_min_index] = hand_max  # Make lowest card == highest card
+            if result == 2: #two pair
+                hand_type[hands] = 3
+                if number_of_jokers[counter] != 0:
+                    if number_of_jokers[counter] == 1:  # if true the jokers were not in either pair!
+                        hand_type[hands] = 5  # Full house is formed!
+                    if number_of_jokers[counter] == 2:  # if true one pair is jokers!
+                        hand_type[hands] = 6  # Four of a kind is formed!
+            else: #three of a kind
+                hand_type[hands] = 4
+                if number_of_jokers[counter] != 0:
+                    if number_of_jokers[counter] == 1:  # if true the jokers were not in three of a kind!
+                        hand_type[hands] = 6  # Four of a kind is formed!
+                    if number_of_jokers[counter] == 3:  # if true the three of a kind found were jokers!
+                        hand_type[hands] = 6  # Four of a kind is formed!
         elif hand_type[hands] == 3:
             # four of a kind or full house
             result = check_duplicates(characters=data[hands, 2:7])
             if result == 3: #full house
-                hand_type[hands] = 6 # Now best hand is four of a kind
-                data[hands, hand_min_index] = hand_max  # Make lowest card == highest card
+                hand_type[hands] = 5
+                if number_of_jokers[counter] != 0:
+                    if number_of_jokers[counter] == 2:  # if true the jokers were the pair!
+                        hand_type[hands] = 7  # Five of a kind is formed!
+                    if number_of_jokers[counter] == 3:  # if true the jokers were the three of a kind!
+                        hand_type[hands] = 7  # Five of a kind is formed!
             else: #four of a kind
-                hand_type[hands] = 7 # Now best hand is five of a kind
-                data[hands, hand_min_index] = hand_max  # Make lowest card == highest card, now five of a kind
+                hand_type[hands] = 6
+                if number_of_jokers[counter] != 0:
+                    if number_of_jokers[counter] == 1:  # if true the joker was the remaining card!
+                        hand_type[hands] = 7  # Five of a kind is formed!
+                    if number_of_jokers[counter] == 4:  # if true the jokers were the four of a kind!
+                        hand_type[hands] = 7  # Five of a kind is formed!
         elif hand_type[hands] == 4:
             # Five of a kind!
-            hand_type[hands] = 7 # No change as cannot get better
+            hand_type[hands] = 7 # in this case the hand cannot get better so jokers or not does not matter
         else:
             print("Error: hand_type not recognised!!!")
+        counter += 1
     data = np.insert(data, 2, [hand_type], axis=1)
     data = data[data[:, 2].argsort()]
-
     # Lets sort it all by walking down each column and seeing if adjacent rows have the same values
     #for j in range(number_of_hands):
     for j in range(2,7):
@@ -142,11 +167,6 @@ def main():
     print("Elapsed time:", round((ts1 - ts0)//3600,2), "hours or", round(ts1 - ts0,1),"seconds!")
     print(" ")
     print("Finishing time:", time.ctime())
-    file_path = "D:\Advent_of_Code\Advent_of_Code_2023\Day7\data.txt"
-    # Open the file in write mode and write the array elements
-    with open(file_path, 'w') as file:
-        for item in data:
-            file.write("%s\n" % item)
 
 if __name__ == "__main__":
     main()
