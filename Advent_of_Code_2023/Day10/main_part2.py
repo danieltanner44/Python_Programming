@@ -1,7 +1,6 @@
 import numpy as np
 import time
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
 def reading_input_data(f):
     print("Reading input data...", end = "")

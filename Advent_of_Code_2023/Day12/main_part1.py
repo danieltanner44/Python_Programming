@@ -30,6 +30,7 @@ def reading_input_data(f):
             data = [list(temp)]
             only_once = True
     del(each_line, only_once, temp)
+
     print("[complete]", end="\n")
     print(" ")
     print("The input data is:", "\n", "", data)

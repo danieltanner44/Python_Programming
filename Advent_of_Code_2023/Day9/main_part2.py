@@ -1,104 +1,72 @@
 import numpy as np
 import time
-import math
+import matplotlib.pyplot as plt
+from scipy.interpolate import CubicSpline
 
-def reading_input_data(f):
+def reading_input_data(fI):
     print("Reading input data...", end = "")
     print("[complete]", end="\n")
     print(" ")
-    # Lets read all of the input data
-    symbol_list = {"\n","(",")",","}
-    directions = []
-    data = np.array([])
-    starting_list = np.array([], dtype=int)
-    finishing_list = np.array([], dtype=int)
-    number_of_maps = 0
+    data = np.array([], dtype=int)
+    number_of_lines, number_of_numbers = 0, 0
     only_once = False
-    for each_line in f:
+    for each_line in fI:
         # Lets read in all the key information
-        if number_of_maps >= 2:
-            each_line = each_line.split()
-            temp = each_line[0]
-            if temp[2] == "A":
-                starting_list = np.append(starting_list, (number_of_maps - 2))
-            if temp[2] == "Z":
-                finishing_list = np.append(finishing_list, (number_of_maps - 2))
-            for symbol in symbol_list:
-                each_line = [element.replace(symbol, "") for element in each_line]
-            if only_once == False:
-                data = each_line
-                only_once = True
-            else:
-                data = np.vstack((data, each_line))
-            number_of_maps += 1
-        elif number_of_maps == 0:
-            temp1 = each_line.strip("\n")
-            number_of_maps += 1
-            continue
-        elif number_of_maps == 1:
-            number_of_maps += 1
-            continue
-    # Tidy up input data
-    starting_list = starting_list
-    finishing_list = finishing_list
-    [directions.append(letter) for letter in temp1]
-    data = np.delete(data, 1, 1)
-    side = {"L" : 1, "R" : 2}
-    directions_int = np.array([], dtype=int)
-    for i in range(0,len(directions)):
-        directions_int = np.append(directions_int, side.get(directions[i]))
-    my_list = dict(zip(data[:,0],range(np.shape(data)[0])))
-    for i in range(np.shape(data)[0]):
-        for j in range(np.shape(data)[1]):
-            data[i,j] = my_list.get(data[i,j])
-    print("List of starting nodes is:", starting_list)
-    print("List of finishing nodes is:", finishing_list)
-    del (temp, temp1, symbol_list, directions, only_once, number_of_maps, each_line, side)
-    return data, my_list, directions_int, starting_list, finishing_list
+        each_line = (each_line.strip("\n")).split()
+        number_of_lines += 1
+        number_of_numbers += len(each_line)
+        if only_once == True:
+            data = np.vstack((data, np.int64(each_line)))
+        else:
+            data = np.int64(each_line)
+            only_once = True
+    del(each_line, only_once)
+    fI.close()
+    print("Number of lines:",number_of_lines,"and size of data array:",np.shape(data))
+    return data, number_of_lines
 
-def stepping(data, directions_int, starting_list, finishing_list):
-    number_of_steps, done = 0, False
-    current_row = starting_list
-    i_range = range(len(directions_int))
-    num_i_range = len(i_range)
-    j_range = range(len(starting_list))
-    n_cycle = np.ones(len(starting_list), dtype=int)
-    found_node = np.ones(len(starting_list), dtype=int)
-    print(" ")
-    print("Stepping through all maps...")
-    while done == False:
-        for i in i_range:
-            current_row[:] = data[current_row[:], directions_int[i % num_i_range]]
-            for j in j_range:
-                for k in j_range:
-                    if current_row[j] == finishing_list[k]:
-                        if found_node[j] == 1:
-                            print("Found node:", j, "with this n_cycle", number_of_steps + i, "finishing value is:", current_row[j])
-                            found_node[j] = 0
-                            n_cycle[j] = number_of_steps + i + 1
-                            print("Nodes found so far:", found_node)
-                        if np.sum(found_node) == 0:
-                            return done, n_cycle
-        number_of_steps += num_i_range
-        if number_of_steps % 1000 == 0:
-            print("Number of search cycles is:", number_of_steps)
-    del(current_row)
+def process_extrapolation(data_i, i, fO):
+    counter, extrapolated_value = 0, 0
+    temp = temp1 = np.array(data_i, dtype=int)
+    counter = 1
+    while np.sum(np.abs(temp1)) != 0:
+        temp1 = np.array(np.diff(temp1), dtype=int) # difference rows
+        temp = np.array(np.vstack((temp, np.zeros(len(data_i)))), dtype=int) # Stick in row of zeros
+        temp[counter, counter:counter + len(temp1) + 1] = temp1 # fill row with difference output
+        counter += 1
+    temp = np.insert(temp, 0, np.zeros((1, counter)),axis=1) # Add zeros to the start of the array
+    temp = np.array(temp, dtype=int) # make integer array
+    if np.sum(np.abs(temp1)) == 0:
+        # Lets reconstruct
+        for j in range(counter - 1): # Must not wrap over to top of array
+            temp[counter - j - 2, np.shape(temp)[1] - len(temp1) - j - 2] = temp[counter - j - 2, np.shape(temp)[1] - len(temp1) - j - 1] - temp[counter - j - 1, np.shape(temp)[1] - len(temp1) - j - 1]
+            extrapolated_value = temp[counter - j - 2, np.shape(temp)[1] - len(temp1) - j - 2]
+    return extrapolated_value, counter
 
 def main():
+    total_extrapolated_values = np.array([(0)], dtype=int)
     ts0 = time.time()
-    print("Starting time:", ts0)
+    test_counter_index = counter_index = np.array([(0)], dtype=int)
+    print("Starting time:", time.ctime())
     print(" ")
-    f = open(r'D:\Advent_of_Code\Advent_of_Code_2023\Day8\Puzzle_Input.txt', 'r')
+    fI = open(r'D:\Advent_of_Code\Advent_of_Code_2023\Day9\Puzzle_Input.txt', 'r')
+    fO = open(r"D:\Advent_of_Code\Advent_of_Code_2023\Day9\output.txt", "w")
     # Read all of the input data from Puzzle Input and organise it
-    data, my_list, directions_int, starting_list, finishing_list = reading_input_data(f)
+    data, number_of_lines = reading_input_data(fI)
     # Step through the data and see how many steps it takes to complete the puzzle
-    done, n_cycle = stepping(data, directions_int, starting_list, finishing_list)
-    print("The number of steps required to complete the puzzle are:", math.lcm(*n_cycle))
+    i = number_of_lines
+    for i in range(number_of_lines):
+        data_i = data[i, :]
+        extrapolated_value, counter = process_extrapolation(data_i, i, fO)
+        counter_index = np.append(counter_index, counter)
+        total_extrapolated_values = np.append(total_extrapolated_values, extrapolated_value)
+    print("The total for the extrapolated values for the puzzle is:", np.sum(total_extrapolated_values))
     ts1 = time.time()
     print(" ")
     print("Elapsed time:", round((ts1 - ts0)//3600,2), "hours or", round(ts1 - ts0,1),"seconds!")
     print(" ")
     print("Finishing time:", time.ctime())
+    fO.close()
 
 if __name__ == "__main__":
     main()
