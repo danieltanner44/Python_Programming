@@ -1,0 +1,9 @@
+progress bar
+
+fold matrix???
+
+duplicates in a list -> returns a dictionary with the set of elements and their occurance rate
+
+
+find intersection between two sets of points that define line segments
+

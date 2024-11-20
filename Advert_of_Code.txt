@@ -1,3 +1,0 @@
-D:\Advent_of_Code>git add .
-D:\Advent_of_Code>git commit -m "Completed Part 1 and Part 2 of all puzzles up to and including Day 11!"
-D:\Advent_of_Code>git push origin main
