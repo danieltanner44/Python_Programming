@@ -1,4 +1,2 @@
-*Lib/
-*pyvenv.cfg 
-*Scripts/
-*share/
+# created by virtualenv automatically
+*

@@ -1,15 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from colorama import Fore, Back, Style
+
 
 def plot_array(array, cmap="gray", title="Title", xlabel="x", ylabel="y"):
     """
     Plots a 2D array as an image with a color map and color bar.
-    
-    The function takes a 2D NumPy array and displays it as an image using Matplotlib. 
-    Each element in the array is represented by a color, and a color bar is added to 
+
+    The function takes a 2D NumPy array and displays it as an image using Matplotlib.
+    Each element in the array is represented by a color, and a color bar is added to
     show the mapping of values to colors. By default, the color map is set to 'gray'.
 
-    Input validation is performed to ensure that the input is a 2D NumPy array containing 
+    Input validation is performed to ensure that the input is a 2D NumPy array containing
     only numeric values.
 
     Parameters
@@ -48,11 +50,11 @@ def plot_array(array, cmap="gray", title="Title", xlabel="x", ylabel="y"):
     >>> plot_array(array, cmap='viridis', title='My Plot', xlabel='Column', ylabel='Row')
     (Displays a plot of the array)
     """
-    
+
     # Input validation
     if not isinstance(array, np.ndarray):
         raise ValueError("Input must be a NumPy array.")
-    
+
     if array.ndim != 2:
         raise ValueError("Input must be a 2D array.")
 
@@ -73,14 +75,14 @@ def plot_array(array, cmap="gray", title="Title", xlabel="x", ylabel="y"):
     plt.show()
     return
 
-    
+
 def toggle(array, a=0, b=1):
     """
     Toggles the values in a NumPy array between two specified values `a` and `b`.
 
-    The function replaces all instances of `a` in the input array with `b` and vice versa. 
+    The function replaces all instances of `a` in the input array with `b` and vice versa.
     If no values for `a` and `b` are provided, the default values of `0` and `1` are used.
-    
+
     Input validation is performed to ensure:
     - The input is a NumPy array.
     - The array contains exactly two unique values.
@@ -99,7 +101,7 @@ def toggle(array, a=0, b=1):
     -------
     toggled_array : np.ndarray
         A new NumPy array with all instances of `a` replaced with `b` and vice versa.
-    
+
     Raises
     ------
     ValueError
@@ -124,7 +126,7 @@ def toggle(array, a=0, b=1):
            ['X', 'Y', 'Y'],
            ['Y', 'X', 'Y']])
     """
-    
+
     # Input validation
     # Validate if the input array is a NumPy array
     if not isinstance(array, np.ndarray):
@@ -146,18 +148,19 @@ def toggle(array, a=0, b=1):
     # If a or b are not found in the array, raise a warning
     if a not in array and b not in array:
         raise ValueError(f"Neither 'a' ({a}) nor 'b' ({b}) found in the array.")
-        
+
     # Toggle the values of the array
     shape = np.shape(array)
     toggled_array = array.copy()
     for i in range(shape[0]):
         for j in range(shape[1]):
-            if array[i,j] == a:
-                toggled_array[i,j] = b
-            if array[i,j] == b:
-                toggled_array[i,j] = a
+            if array[i, j] == a:
+                toggled_array[i, j] = b
+            if array[i, j] == b:
+                toggled_array[i, j] = a
     return toggled_array
-    
+
+
 def plot_journey(location_history):
     # Convert the list of points to a NumPy array for easier manipulation
     data_array = np.array(location_history)
@@ -189,18 +192,17 @@ def plot_journey(location_history):
     cbar = plt.colorbar(sm, ax=ax, label='Y values')  # Add color bar
     plt.grid()
     plt.show()
-    
-    
-    #Add this to put circle of interest on points of graph!
-    #from matplotlib.patches import Circle
-    
-    ## Create and add a circle patch
-    #circle = Circle(intersection, 4, color='red', fill=False, linewidth=5, label='1st intersection')
-    #ax.add_patch(circle)
 
+    # Add this to put circle of interest on points of graph!
+    # from matplotlib.patches import Circle
+
+    ## Create and add a circle patch
+    # circle = Circle(intersection, 4, color='red', fill=False, linewidth=5, label='1st intersection')
+    # ax.add_patch(circle)
 
     return
-    
+
+
 def generate_ulam_spiral(size=7, handedness="left"):
     """
     Generates an Ulam spiral of a specified size and handedness.
@@ -216,22 +218,22 @@ def generate_ulam_spiral(size=7, handedness="left"):
         The size of the grid (number of rows and columns). Must be a positive integer.
         If an even number is given, it will be incremented by 1 to ensure the grid
         has an odd size, so the spiral can start from the exact center.
-    
+
     handedness : str, optional, default="left"
-        The direction of turns in the spiral. Accepted values are "Left" or "Right" 
-        (case insensitive). "Left" generates a counterclockwise spiral, while "Right" 
+        The direction of turns in the spiral. Accepted values are "Left" or "Right"
+        (case insensitive). "Left" generates a counterclockwise spiral, while "Right"
         generates a clockwise spiral.
 
     Returns:
     -------
     np.ndarray
-        A 2D numpy array of shape (size, size), where each cell contains an integer 
+        A 2D numpy array of shape (size, size), where each cell contains an integer
         in the sequence from 1 to size^2, arranged in the Ulam spiral pattern.
 
     Raises:
     ------
     ValueError
-        If `size` is not a positive integer or if `handedness` is not one of 
+        If `size` is not a positive integer or if `handedness` is not one of
         the accepted values.
 
     Examples:
@@ -255,7 +257,7 @@ def generate_ulam_spiral(size=7, handedness="left"):
     # Validate size
     if not isinstance(size, int) or size <= 0:
         raise ValueError("`size` must be a positive integer.")
-    
+
     # Ensure size is odd for centering
     if size % 2 == 0:
         size += 1
@@ -432,6 +434,7 @@ def print_array(array, *mapping):
 
     return
 
+
 def determine_num_duplicates_in_list(input_list):
     """
     Determines the number of occurrences (duplicates) of each unique element in a list.
@@ -469,3 +472,53 @@ def determine_num_duplicates_in_list(input_list):
     duplicate_dict = {element: input_list.count(element) for element in unique_elements}
 
     return duplicate_dict
+
+
+def fstring(string, foreground, background):
+    """
+    Returns a formatted string with specified foreground and background colors using colorama.
+
+    Args:
+        string (str): The text to display.
+        foreground (str): Two-character code for the foreground color. Accepted values are:
+                          "bk" (Black), "wt" (White), "bl" (Blue), "rd" (Red), "gr" (Green).
+        background (str): Two-character code for the background color. Accepted values are:
+                          "bk" (Black), "wt" (White), "bl" (Blue), "rd" (Red), "gr" (Green).
+
+    Returns:
+        str: The formatted string with the specified colors.
+
+    Raises:
+        TypeError: If string is not a string.
+        ValueError: If `foreground` or `background` is not a valid color code.
+
+    Example:
+        >>> fprint("Hello, World!", "rd", "wt")
+        (returns "Hello, World!" with instructions for red text with a white background)
+    """
+    # Define the color mappings
+    color_dict = {
+        "bk": "BLACK",
+        "wt": "WHITE",
+        "bl": "BLUE",
+        "rd": "RED",
+        "gr": "GREEN",
+    }
+
+    # Validate input
+    if not isinstance(string, str):
+        raise TypeError("Input must be a string.")
+    if foreground not in color_dict:
+        raise ValueError(
+            f"Invalid foreground color code '{foreground}'. Valid codes are: {', '.join(color_dict.keys())}.")
+    if background not in color_dict:
+        raise ValueError(
+            f"Invalid background color code '{background}'. Valid codes are: {', '.join(color_dict.keys())}.")
+
+    # Get the color constants from colorama
+    fore_color = getattr(Fore, color_dict[foreground])
+    back_color = getattr(Back, color_dict[background])
+
+    # Create the formatted string
+    formatted_string = f"{fore_color}{back_color}{string}{Style.RESET_ALL}"
+    return formatted_string
