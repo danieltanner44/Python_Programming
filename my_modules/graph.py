@@ -35,7 +35,7 @@ def create_adjacency_matrix(nodes, edges):
     print("\n==============================================")
     print("Creating adjacency matrix ...", end="\r")
     adjacency_matrix = {node: set() for node in nodes}  # Use a set for unique neighbors
-    
+
     # Populate the adjacency matrix
     for edge in edges:
         node1, node2 = edge
@@ -43,7 +43,7 @@ def create_adjacency_matrix(nodes, edges):
             adjacency_matrix[node1].add(node2)
         if node2 in adjacency_matrix:
             adjacency_matrix[node2].add(node1)
-            
+
     # Convert sets back to lists and print completion
     for node in adjacency_matrix:
         adjacency_matrix[node] = list(adjacency_matrix[node])
@@ -51,6 +51,7 @@ def create_adjacency_matrix(nodes, edges):
     print("complete\n")
     print("==============================================")
     return adjacency_matrix
+
 
 def create_directional_adjacency_matirx(edges):
     """
@@ -86,11 +87,12 @@ def create_directional_adjacency_matirx(edges):
 
     # Create the directional adjacency matrix
     nodes = sorted(set([x for y in edges for x in y]))
-    directional_adjacency_matrix = {node : [[],[]] for node in nodes}
+    directional_adjacency_matrix = {node: [[], []] for node in nodes}
     for edge in edges:
         directional_adjacency_matrix[edge[1]][0].append(edge[0])
         directional_adjacency_matrix[edge[0]][1].append(edge[1])
     return directional_adjacency_matrix
+
 
 def find_all_paths(start_point, end_point, allowable_visits, nodes, adjacency_matrix):
     """
@@ -171,7 +173,7 @@ def find_all_paths(start_point, end_point, allowable_visits, nodes, adjacency_ma
         # If the last node in the current path is not the end point
         if queue[-1] != end_point:
             current_node = queue[-1]
-            current_visited_nodes[current_node] += 1 # Mark the current node as visited once
+            current_visited_nodes[current_node] += 1  # Mark the current node as visited once
 
             # Explore neighbours
             for neighbour in adjacency_matrix[current_node]:
