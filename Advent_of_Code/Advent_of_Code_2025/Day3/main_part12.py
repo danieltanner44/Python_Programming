@@ -57,7 +57,7 @@ def main():
     output_length = 2
     max_joltages = calculate_max_joltages(bank_joltages, output_length)
     part_one_ans = sum(max_joltages)
-    print(f'The code to unlock the safe is: {fstring(str(part_one_ans), "wt", "bk")}')
+    print(f'The total output joltage is: {fstring(str(part_one_ans), "wt", "bk")}')
     print(fstring(f"==============================================================", "bk", "bl"))
     print(" ")
 
@@ -67,7 +67,7 @@ def main():
     output_length = 12
     max_joltages = calculate_max_joltages(bank_joltages, output_length)
     part_two_ans = sum(max_joltages)
-    print(f'The code to unlock the safe is: {fstring(str(part_two_ans), "wt", "bk")}')
+    print(f'The new total output joltage is: {fstring(str(part_two_ans), "wt", "bk")}')
     print(fstring(f"==============================================================", "bk", "bl"))
     print(" ")
 

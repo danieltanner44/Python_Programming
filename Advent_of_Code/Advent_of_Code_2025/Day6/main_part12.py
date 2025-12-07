@@ -95,7 +95,7 @@ def main():
     print(f'{fstring("Part One:", "bk", "wt")}')
     sum_problem_answers = evaluate_problems(problems, operations)
     part_one_ans = sum_problem_answers
-    print(f'The number of accessible rolls are: {fstring(str(part_one_ans), "wt", "bk")}')
+    print(f'The grand total of summing the problem answers is: {fstring(str(part_one_ans), "wt", "bk")}')
     print(fstring(f"=================================================================", "bk", "bl"))
     print(" ")
 
@@ -104,7 +104,7 @@ def main():
     print(f'{fstring("Part Two:", "bk", "wt")}')
     sum_problem_answers = evaluate_problems_cephalopods(problems_with_spaces, operations)
     part_two_ans = sum_problem_answers
-    print(f'The total number of rolls that can be removed is: {fstring(str(part_two_ans), "wt", "bk")}')
+    print(f'The grand total of summing the problem answers is: {fstring(str(part_two_ans), "wt", "bk")}')
     print(fstring(f"=================================================================", "bk", "bl"))
     print(" ")
 

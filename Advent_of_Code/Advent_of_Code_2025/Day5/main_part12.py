@@ -110,7 +110,7 @@ def main():
     number_of_fresh_ingredients = determine_number_of_fresh_ingredients(
         ingredient_ID_ranges, ingredient_IDs)
     part_one_ans = number_of_fresh_ingredients
-    print(f'The number of accessible rolls are: {fstring(str(part_one_ans), "wt", "bk")}')
+    print(f'The total number fresh ingredient IDs is: {fstring(str(part_one_ans), "wt", "bk")}')
     print(fstring(f"=================================================================", "bk", "bl"))
     print(" ")
 
@@ -119,7 +119,7 @@ def main():
     print(f'{fstring("Part Two:", "bk", "wt")}')
     number_of_fresh_ingredient_IDs = determine_fresh_ingredient_ranges(ingredient_ID_ranges)
     part_two_ans = number_of_fresh_ingredient_IDs
-    print(f'The total number of rolls that can be removed is: {fstring(str(part_two_ans), "wt", "bk")}')
+    print(f'The total number of fresh ingredient IDs is: {fstring(str(part_two_ans), "wt", "bk")}')
     print(fstring(f"=================================================================", "bk", "bl"))
     print(" ")
 

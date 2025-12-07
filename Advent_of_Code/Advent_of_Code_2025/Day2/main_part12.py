@@ -88,7 +88,7 @@ def main():
     print(fstring(f"==============================================================", "bk", "bl"))
     print(f'{fstring("Part One:", "bk", "wt")}')
     part_one_ans = process_ranges_part1(input_ranges)
-    print(f'The code to unlock the safe is: {fstring(str(part_one_ans), "wt", "bk")}')
+    print(f'The sum of the invalid IDs is: {fstring(str(part_one_ans), "wt", "bk")}')
     print(fstring(f"==============================================================", "bk", "bl"))
     print(" ")
 
@@ -96,7 +96,7 @@ def main():
     print(fstring(f"==============================================================", "bk", "bl"))
     print(f'{fstring("Part Two:", "bk", "wt")}')
     part_two_ans = process_ranges_part2(input_ranges)
-    print(f'The code to unlock the safe is: {fstring(str(part_two_ans), "wt", "bk")}')
+    print(f'The sum of the invalid IDs is: {fstring(str(part_two_ans), "wt", "bk")}')
     print(fstring(f"==============================================================", "bk", "bl"))
     print(" ")
 
