@@ -37,75 +37,57 @@ def process_junction_boxes(number_circuits, junction_box_locations, distance_bet
     circuit_tracker = []
     # Sort junction box distances to start with shortest
     distance_between_junction_box_pairs = distance_between_junction_box_pairs[distance_between_junction_box_pairs[:,0].argsort()]
-    counter = -1
+    counter = 0
 
     while True:
-        in_one_circuit = False
-        in_same_circuit = False
-        in_separate_circuits = False
+        # For the first loop just add the first pair of junction boxes as a new circuit
+        if counter == 0:
+            circuit_tracker.append([distance_between_junction_box_pairs[counter, 1], distance_between_junction_box_pairs[counter, 2]])
 
-        # Counter index used to move to the next shortest distance by incrementing index for each loop
-        counter += 1
+        # Check if either junction is in an existing circuit and if so what circuit they affect
+        circuit_indexes = [None, None]
+        for index, circuit in enumerate(circuit_tracker):
+            if distance_between_junction_box_pairs[counter, 1] in circuit:
+                circuit_indexes[0] = index
+            if distance_between_junction_box_pairs[counter, 2] in circuit:
+                circuit_indexes[1] = index
+
+        if circuit_indexes[0] is None and circuit_indexes[1] is None:
+            # Neither of the junction boxes are in an existing circuit then just add both as new circuit
+            circuit_tracker.append([distance_between_junction_box_pairs[counter, 1], distance_between_junction_box_pairs[counter, 2]])
+
+        elif circuit_indexes[0] is None or circuit_indexes[1] is None:
+            # One of the junction boxes is in an existing circuit
+            # Check if only one is in an existing circuit
+            if circuit_indexes[0] is not None:
+                circuit_tracker[circuit_indexes[0]] += [distance_between_junction_box_pairs[counter, 2]]
+            elif circuit_indexes[1] is not None:
+                circuit_tracker[circuit_indexes[1]] += [distance_between_junction_box_pairs[counter, 1]]
+
+        elif circuit_indexes[0] != circuit_indexes[1]:
+            # Each junction box is in a separate circuit so need to merge them
+            # Add the merged circuit, remove each of the originals
+            circuit_tracker.append(circuit_tracker[circuit_indexes[0]] + circuit_tracker[circuit_indexes[1]])
+            circuit_tracker.pop(max(circuit_indexes))
+            circuit_tracker.pop(min(circuit_indexes))
 
         # PART ONE COMPLETION CHECK
-        if counter == number_circuits:
+        if counter == number_circuits - 1:
             # For Part 1 once the required number of connections are made store the current circuit list
-            Part1_circuit_tracker = copy.deepcopy(circuit_tracker)
+            part1_circuit_tracker = copy.deepcopy(circuit_tracker)
 
         # PART TWO COMPLETION CHECK
         # For Part Two stop making connections when all junction boxes are connected together
-        if counter > 1 and len(circuit_tracker[0]) == shape[0]:
+        if len(circuit_tracker[0]) == shape[0]:
             # Now the circuits are fully complete/connected multiply the X coordinates of the last two junction boxes together
-            last_connected_pair = distance_between_junction_box_pairs[counter -1, 1:]
+            last_connected_pair = distance_between_junction_box_pairs[counter, 1:]
             multiplication_x_last_junction_boxes = junction_box_locations[last_connected_pair[0]][0] * \
                                                    junction_box_locations[last_connected_pair[1]][0]
             break
+        # Counter index used to move to the next shortest distance by incrementing index for each loop
+        counter += 1
 
-        # Both junction boxes in the same circuit
-        for index, circuit in enumerate(circuit_tracker):
-            if distance_between_junction_box_pairs[counter, 1] in circuit and distance_between_junction_box_pairs[counter, 2] in circuit:
-                # Do nothing as both in same circuit
-                in_same_circuit = True
-                break
-
-        # Each in a separate circuit
-        if not in_same_circuit:
-            separate_circuit_indexes = []
-            for index, circuit in enumerate(circuit_tracker):
-                if distance_between_junction_box_pairs[counter, 1] in circuit:
-                    separate_circuit_indexes.extend([index])
-                    circuit1 = circuit
-                if distance_between_junction_box_pairs[counter, 2] in circuit:
-                    separate_circuit_indexes.extend([index])
-                    circuit2 = circuit
-            if len(separate_circuit_indexes) == 2:
-                in_separate_circuits = True
-                # Merge circuits
-                circuit_tracker.pop(max(separate_circuit_indexes))
-                circuit_tracker.pop(min(separate_circuit_indexes))
-                circuit_tracker.append(circuit1 + circuit2)
-
-        # Check if only one is in an existing circuit
-        if not in_same_circuit and not in_separate_circuits:
-            for index, circuit in enumerate(circuit_tracker):
-                if distance_between_junction_box_pairs[counter, 1] in circuit:
-                    circuit.append(distance_between_junction_box_pairs[counter, 2])
-                    in_one_circuit = True
-                    break
-                elif distance_between_junction_box_pairs[counter, 2] in circuit:
-                    circuit.append(distance_between_junction_box_pairs[counter, 1])
-                    in_one_circuit = True
-                    break
-
-        # If neither junction boxes are in either circuit then just add as new circuit
-        if not in_same_circuit and not in_separate_circuits and not in_one_circuit:
-            circuit_tracker.append([distance_between_junction_box_pairs[counter, 1], distance_between_junction_box_pairs[counter, 2]])
-
-        # For the first loop just add the first pair of junction boxes as a new circuit
-        if len(circuit_tracker) == 0:
-            circuit_tracker.append([distance_between_junction_box_pairs[counter, 1], distance_between_junction_box_pairs[counter, 2]])
-
-    return Part1_circuit_tracker, multiplication_x_last_junction_boxes
+    return part1_circuit_tracker, multiplication_x_last_junction_boxes
 
 def calculate_multiplication_of_three_largest_circuits(Part1_circuit_tracker):
     # Calculate junction box sizes
